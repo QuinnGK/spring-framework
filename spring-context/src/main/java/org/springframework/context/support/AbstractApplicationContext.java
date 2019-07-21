@@ -572,6 +572,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			//扩展BeanFactory
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -706,11 +707,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
+		//设置类加载器1.先拿上下文类加载器,else 2.拿ClassUtil的类加载器,else 3.拿系统类加载器
 		beanFactory.setBeanClassLoader(getClassLoader());
+		//设置一个标准的SpringEl解析器
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
+		//添加属性编辑注册器
+		//在AbstractBeanFactroy的initBeanWapper中调用
+		//然后全部注册进PropertyEditorRegistrySupport.customEditors
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		//TODO 没懂下面的这些用来做什么
+		//<----------------------------------------------------------
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
@@ -735,8 +743,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Set a temporary ClassLoader for type matching.
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
-
+		//---------------------------------------------------------->
 		// Register default environment beans.
+		//将配置文件和环境变量单例化保存起来
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
 		}
