@@ -76,6 +76,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
 	@Override
 	@Nullable
+	//后处理器的前置方法
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		AccessControlContext acc = null;
 
@@ -99,6 +100,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 		return bean;
 	}
 
+	//对Aware标示的接口进行填充
 	private void invokeAwareInterfaces(Object bean) {
 		if (bean instanceof Aware) {
 			if (bean instanceof EnvironmentAware) {
@@ -123,6 +125,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	}
 
 	@Override
+	//后处理器的后置方法
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
 	}

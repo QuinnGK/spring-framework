@@ -40,6 +40,7 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
+//在初始化实例时加入前置和后置方法
 public interface BeanPostProcessor {
 
 	/**
