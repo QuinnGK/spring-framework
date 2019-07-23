@@ -71,6 +71,10 @@ public abstract class AopNamespaceUtils {
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
+	//主要做了三件事情
+	//注册AutpProxyCreator
+	//处理proxy-target-class | expose-proxy属性
+	//注册组件并通知
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
