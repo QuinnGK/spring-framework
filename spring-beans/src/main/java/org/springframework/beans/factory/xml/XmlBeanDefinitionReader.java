@@ -322,28 +322,34 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
+	//xml解析的入口方法
 	public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
 		Assert.notNull(encodedResource, "EncodedResource must not be null");
 		if (logger.isTraceEnabled()) {
 			logger.trace("Loading XML bean definitions from " + encodedResource);
 		}
-
+		//拿到当前线程已加载的Resource,没有则去新建一个Set保存要加载的Resource
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
 			currentResources = new HashSet<>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
+		//如果已经加载过则直接抛异常，此处检测循环依赖
 		if (!currentResources.add(encodedResource)) {
 			throw new BeanDefinitionStoreException(
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
 		try {
+			//拿到资源
 			InputStream inputStream = encodedResource.getResource().getInputStream();
 			try {
+				//将输入流用InputSource包装以下
 				InputSource inputSource = new InputSource(inputStream);
+				//设置编码
 				if (encodedResource.getEncoding() != null) {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
+				//加载BeanDefinitions
 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			} finally {
 				inputStream.close();
@@ -352,6 +358,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			throw new BeanDefinitionStoreException(
 					"IOException parsing XML document from " + encodedResource.getResource(), ex);
 		} finally {
+			//加载完之后将资源移除
 			currentResources.remove(encodedResource);
 			if (currentResources.isEmpty()) {
 				this.resourcesCurrentlyBeingLoaded.remove();
@@ -385,7 +392,6 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		return doLoadBeanDefinitions(inputSource, new DescriptiveResource(resourceDescription));
 	}
 
-
 	/**
 	 * Actually load bean definitions from the specified XML file.
 	 *
@@ -398,9 +404,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 */
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
-
 		try {
+			//将InputSource解析为Document
 			Document doc = doLoadDocument(inputSource, resource);
+			//注册BeanDefinitions
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Loaded " + count + " bean definitions from " + resource);
@@ -426,6 +433,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 	}
 
+
 	/**
 	 * Actually load the specified document using the configured DocumentLoader.
 	 *
@@ -437,6 +445,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see DocumentLoader#loadDocument
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
+		//获得ResourceEntityResolver
+		//获得XML的校验方式getValidationModeForResource(resource)
+		//将inputSource,ResourceEntityResolver,校验方式，是否开启命名空间(默认false)
 		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
 				getValidationModeForResource(resource), isNamespaceAware());
 	}
@@ -514,11 +525,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
+		//通过反射创建BeanDefinitionDocumentReader
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+		//获得已注册的个数
 		int countBefore = getRegistry().getBeanDefinitionCount();
+		//注册BeanDefinition
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+		//返回新注册的个数
 		return getRegistry().getBeanDefinitionCount() - countBefore;
 	}
+
 
 	/**
 	 * Create the {@link BeanDefinitionDocumentReader} to use for actually
