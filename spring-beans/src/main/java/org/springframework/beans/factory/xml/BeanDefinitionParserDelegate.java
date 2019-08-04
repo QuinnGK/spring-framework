@@ -305,7 +305,9 @@ public class BeanDefinitionParserDelegate {
 	 * @see #getDefaults()
 	 */
 	public void initDefaults(Element root, @Nullable BeanDefinitionParserDelegate parent) {
+		//填充默认值
 		populateDefaults(this.defaults, (parent != null ? parent.defaults : null), root);
+		//no-oper
 		this.readerContext.fireDefaultsRegistered(this.defaults);
 	}
 
