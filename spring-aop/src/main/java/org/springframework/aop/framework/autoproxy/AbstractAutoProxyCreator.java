@@ -456,6 +456,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return the AOP proxy for the bean
 	 * @see #buildAdvisors
 	 */
+	//创建代理的入口方法
+	//可以从SmartInstantiationAwareBeanPostProcessor.getEarlyBeanReference进入
+	//也可以从postProcessBefore或者postProcessAfter这两个方法进入
 	protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
 								 @Nullable Object[] specificInterceptors, TargetSource targetSource) {
 

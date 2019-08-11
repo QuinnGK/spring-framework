@@ -44,10 +44,15 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/** Map from alias to canonical name. */
+	//key为别名，value为规范名称
 	private final Map<String, String> aliasMap = new ConcurrentHashMap<>(16);
 
 
 	@Override
+	/**
+	 * 目前看到的调用这个方法的方式如
+	 * BeanDefinitionReaderUtils,是统一将beanName,alias存入。
+	 */
 	public void registerAlias(String name, String alias) {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
