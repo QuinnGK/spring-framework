@@ -276,22 +276,25 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 				//在创建Bean之前做一些操作 例如：在创建前将BeanName记录在当前创建Bean池
 				beforeSingletonCreation(beanName);
+				//做创建检验标志。默认为失败
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					//回调方法实际调用了AbstractBeanFactroy.createBean()方法
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				} catch (IllegalStateException ex) {
-					// Has the singleton object implicitly appeared in the meantime ->
-					// if yes, proceed with it since the exception indicates that state.
+					// Has the singleton object implicitly appeared in the meantime -> if yes, proceed with it since the exception indicates that state.
+					//TODO 没懂这里为什么出异常
 					singletonObject = this.singletonObjects.get(beanName);
 					if (singletonObject == null) {
 						throw ex;
 					}
 				} catch (BeanCreationException ex) {
+					//TODO 异常体系待研究
 					if (recordSuppressedExceptions) {
 						for (Exception suppressedException : this.suppressedExceptions) {
 							ex.addRelatedCause(suppressedException);
@@ -302,8 +305,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					//创建Bean之后做一些操作，例如将BeanName从当前创建Bean池中移除
 					afterSingletonCreation(beanName);
 				}
+				//根据创建标记将实例放入单例缓存
 				if (newSingleton) {
 					addSingleton(beanName, singletonObject);
 				}
@@ -414,7 +419,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the singleton that has been created
 	 * @see #isSingletonCurrentlyInCreation
 	 */
+	//在创建单例实例之后的回调方法，可以供子类重写。在创建之后做什么事
+	//默认如下
 	protected void afterSingletonCreation(String beanName) {
+		//与beforeSingletonCreation类似，不过是从BeanName从当前创建Bean池中移除
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.remove(beanName)) {
 			throw new IllegalStateException("Singleton '" + beanName + "' isn't currently in creation");
 		}
