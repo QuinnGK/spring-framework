@@ -666,12 +666,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		//用实现类PropertySourcesPropertyResolver去执行validateRequiredProperties()
 		//执行代码在AbstractPropertyResolver
 		//用来校验RequiredProperties是否都存在
-		//TODO 问题是在createEnvironment()的时候，new的一个为空的MutablePropertySources？用RequiredProperties和空集合对比？
 		getEnvironment().validateRequiredProperties();
 
-		//以下这几个暂时未搞懂//TODO
 		//<----------------------------------------------------------
 		// Store pre-refresh ApplicationListeners...
+		//早器监听器
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		} else {
@@ -682,6 +681,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Allow for the collection of early ApplicationEvents,
 		// to be published once the multicaster is available...
+		//早期时间 比如说在容器进行初始化之前可以做什么事情
 		this.earlyApplicationEvents = new LinkedHashSet<>();
 		//---------------------------------------------------------->
 	}
@@ -705,7 +705,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	//获得一个新的BeanFactory
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		//AbstractRefreshableApplicationContext中实现
 		refreshBeanFactory();
+		//通过成员变量获得BeanFactory
 		return getBeanFactory();
 	}
 
